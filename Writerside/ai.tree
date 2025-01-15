@@ -2,9 +2,9 @@
 <!DOCTYPE instance-profile
         SYSTEM "https://resources.jetbrains.com/writerside/1.0/product-profile.dtd">
 
-<instance-profile id="in"
-                 name="Instance Name"
-                 start-page="starter.md">
+<instance-profile id="ai"
+                 name="ASMD Instance"
+                 start-page="Overview.md">
 
     <toc-element topic="Overview.md"/>
     <toc-element topic="starter.md"/>
