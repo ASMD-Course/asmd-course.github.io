@@ -230,7 +230,88 @@ with the IDE for running tests.
 This integration is the main reason I prefer IntelliJ for working with Cucumber. 
 However, for a quick setup and a more lightweight environment, VSCode is a solid alternative.
 
+### 3. Reengineer
+
+For this exercise I've taken the implemented version of GUI exercise from the fist session 
+of the OOP exam Course of the 2023 academic year.
+
+The first step was to analyze the requested features, looking for the main functionalities that the system should have.
+In the Test file the first comment enlists the expected features of the exercise:
+- the user clicks on any cell in the grid, and it numbers incrementally,
+- user can continue to select multiple cells, as long as it does not select one adjacent to an already numbered cell,
+- the first press on a cell *adjacent to a numbered cell* (horizontal/vertical/diagonal), then all numbered cells move up-right by one position,
+- with each subsequent press of any cell, all numbered cells move further up-right by one position,
+- as soon as a press would cause a numbered cell to leave the grid, at which point the application closes.
+
+We can translate these features into Gherkin scenarios:
+
+```gherkin
+Scenario: Click on cells
+    When I click on empty cells that haven't any neighbor
+    Then the cells will be marked incrementally
+    
+Scenario: Click on a cell adjacent to another that is currently marked
+    When I click on a casual cell
+    And then I click on another adjacent to the one clicked previously
+    Then the mark will move upper-right
+
+ Scenario: When the cells starts moving by a previous click on a neighbor then they continue moving on any other click
+    When A cell starts to move
+    And I click on any other cell
+    Then the first cell will continue to move
+
+ Scenario: Complete the game when marked cells
+    When I click on a cell near the border
+    And I click on another adjacent the one near the border
+    Then the game will end
+```
+
+Note that I've merged the first two features into a single scenario, as they are closely related.
+The application use a MVC pattern, so the testing part will be focused on the Controller class, where the main logic is implemented.
+
+The interface of the controller (Logic.java) exposes few methods for the interaction with the view. While this is a good 
+practice, as it exposes the minimum necessary to interact with the application, it is inflexible to use within tests.
+
+```java
+public interface Logic {
+
+    Optional<Integer> hit(Position position);
+
+    Optional<Integer> getMark(Position position);
+
+    boolean isOver();
+}
+```
+
+For this reason the interface has been enriched with additional methods:
+    
+```java
+
+List<Position> getCells();
+
+int getSize();
+
+```
+
+The first one return all the cells that have been marked, while the second one return the size of the grid.
+
+The second step was to implement a wrapper class that extends the Logic interface, adding utility methods for the tests
+letting the original interface untouched.
 
 
+```java
+public interface TestableLogic extends Logic {
+    /**
+     * Creates a neighbor from a given position
+     *
+     * @param position The position to find or create a neighbor for
+     */
+    void createRandomNeighbor(Position position);
 
+    /**
+     * Hit random cell when I click on a position
+     */
+    void hitRandomCell();
 
+}
+```
