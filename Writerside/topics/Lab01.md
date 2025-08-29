@@ -315,3 +315,130 @@ public interface TestableLogic extends Logic {
 
 }
 ```
+### 5. ATDD-LLM
+For the following exercise I will use ChatGPT to analyze and improve Gherkin specifications of an existing application:
+[Scooby](https://github.com/PPS-22-Scooby/PPS-22-Scooby). The tests are structured in multiple .feature files, each one
+describing a specific aspect of the application. First I'll ask ChatGPT to solve a reverse engineer task.
+Input feature files are available [here](https://github.com/PPS-22-Scooby/PPS-22-Scooby/tree/main/src/test/resources/features),
+I'll upload them directly on the chat asking with the following prompt:
+
+> The following files are cucumber features for a library. Can you reverse engineer it? What kind of application is ?
+
+After analyzing the feature files, ChatGPT was able to deduce correctly that the application is a library for scrapping
+websites.
+>  A small framework for crawling websites and extracting data. It wraps URL handling and HTTP, coordinates which pages 
+> have been seen, filters page content with selector policies, and aggregates the extracted results.
+
+Also it tried to infer a minimal API for it.
+
+```python
+url = Url.parse("https://example.com/foo")  # depth awareness, parent(), join()
+resp = Http.get(url)                         # .status, .headers["content-type"], .text
+
+crawler = Crawler(http=Http, validators=[TextOnly()])
+doc = crawler.fetch(url)                     # raises/skips on invalid/offline/non-text
+
+policy = SelectorPolicy(by="class", params=["item", "price"])
+scraper = Scraper(policy)
+items = scraper.apply(doc)                   # [] if no matches
+
+coord = Coordinator()
+if not coord.seen(url):
+    coord.add([url, *discovered_links])      # validates, dedupes http/https
+    result.update(items)                     # batch/merge semantics
+```
+Once the context is clear, ChatGPT was able both to provide new features and to improve the existing ones.
+It created new feature files, I report as an example the one for the Error Handling feature:
+
+```gherkin
+
+Feature: Error handling, retries, and backoff
+  To be resilient
+  The crawler should retry transient errors and fail fast on permanent ones
+
+  Background:
+    Given a crawler with max retries 3
+    And base backoff is 500 milliseconds with exponential factor 2
+    And the request timeout is 3 seconds
+
+  Scenario: Retries on 5xx responses with exponential backoff
+    Given the server at https://flaky.example.com/page returns:
+      | attempt | status |
+      | 1       | 500    |
+      | 2       | 502    |
+      | 3       | 200    |
+    When I fetch "https://flaky.example.com/page"
+    Then the crawler attempts up to 3 times
+    And the final status is 200
+    And the delays were approximately 0.5s then 1.0s between attempts
+
+  Scenario: Honors Retry-After on 429
+    Given https://rate.example.com/data responds 429 with Retry-After 2
+    When I fetch "https://rate.example.com/data"
+    Then the crawler waits ~2 seconds and retries once
+    And if the next response is 200 the fetch is considered successful
+
+  Scenario: Does not retry on non-retriable 4xx (except 408/429)
+    Given https://bad.example.com/missing responds 404
+    When I fetch "https://bad.example.com/missing"
+    Then the crawler does not retry
+    And the fetch result is "permanent_failure"
+
+  Scenario: Times out long-running requests
+    Given https://slow.example.com/hang never responds
+    When I fetch "https://slow.example.com/hang"
+    Then the request times out after ~3 seconds
+    And is retried up to 3 total attempts
+
+  Scenario: Aborts chains of redirects beyond the limit
+    Given max redirects is 5
+    And https://loop.example.com/ redirects 10 times
+    When I fetch "https://loop.example.com/"
+    Then the fetch result is "too_many_redirects"
+```
+The original set of feature files already contains some scenarios for handling errors; this comprehends new cases and its
+more specific.
+I've also asked to improve the existing ones by adding more examples and improving the language, for example the following
+code snippet represents new added scenarios for Results files:
+
+```gherkin
+Scenario: Append items and preserve order
+  When I add items:
+    | name   | url                   |
+    | A      | https://example.com/a |
+    | B      | https://example.com/b |
+  Then the size is 2
+  And item[0].name = "A" and item[1].name = "B"
+
+Scenario: Merge (upsert) by key
+  Given the unique key is "url"
+  When I add an item { "name": "A2", "url": "https://example.com/a" }
+  Then the item at url "https://example.com/a" has name "A2"
+
+Scenario: Reject invalid item with errors
+  When I add an item { "name": "", "url": "not a url" }
+  Then it is rejected with validation errors on "name" and "url"
+
+Scenario: Stable serialization
+  Given I export to JSON twice without changes
+  Then the serialized output is byte-for-byte identical
+
+Scenario: Pagination of large result sets
+  Given page size is 2
+  When the result contains 5 items
+  Then page 1 has 2 items, page 2 has 2 items, page 3 has 1 item
+
+Scenario: Attach and query tags
+  When I tag items where name starts with "A" as "alpha"
+  Then those items include the tag "alpha"
+```
+
+Generally speaking ChatGPT was able both to understand the context of the application and to provide useful improvements
+to the existing Gherkin specifications, as well as to create new ones that were missing. Human feedback is needed to
+ensure that the improvements are valid and that the new features are useful.
+
+
+
+
+
+
