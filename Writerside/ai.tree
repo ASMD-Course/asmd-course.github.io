@@ -8,5 +8,7 @@
 
     <toc-element topic="Overview.md">
         <toc-element topic="Lab01.md"/>
+        <toc-element topic="Lab02.md"/>
+        <toc-element topic="Lab03.md"/>
     </toc-element>
 </instance-profile>
