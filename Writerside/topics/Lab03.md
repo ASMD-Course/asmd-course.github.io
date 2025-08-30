@@ -25,4 +25,229 @@
     - implement it). Assess whether incremental steps and test-first development aid the LLM in generating correct code solutions.
 
 
-### Code Generation
+### 1. Code Generation
+For the following exercise I've tested three different LLMs: ChatGPT 4o, Claude Sonnet 4 and Junie 
+(the LLM integrated in IntelliJ IDEA), trying to test for the first two different prompting strategies: zero-shot and 
+chain of thought.
+
+**ChatGPT 4o**
+The results obtained are available in `task1/chatgpt` folder and are divided in two subfolder: `prompt1` and `prompt2`.
+> _Prompt 1_ (Zero shot): The following files I'm showing to you are from an OOP exam. Follow the instructions on
+TimetableFactoryTest (the comment on the top) make all tests pass.
+
+<br />_Results_:
+  - Produced an average-level implementation, need human refactoring to make it more readable.
+  - Tried to maintain immutability for Timetable data structure, used advanced mechanism of language like streams (not
+    directly asked in the prompt).
+  - **cons**: Some point of implementation are too complex and some tests doesn't pass.
+   
+  For example:
+```java
+this.data = data.entrySet().stream().collect(Collectors.toMap(
+          Map.Entry::getKey,
+          e -> new HashMap<>(e.getValue())
+  ));
+```
+could be write as
+```java
+this.data = Map.copyOf(data);
+```
+Also too many nested for loops, the solution is suboptimal.
+
+> _Prompt 2_ (Chain of thought): The following files I'm showing to you are from an OOP exam. Follow the instructions on
+> TimetableFactoryTest (the comment on the top) make all tests pass.
+> In order to obtain the solution follow these steps:
+
+> 1) Analyze first the interface provided Timetable and TimetableFactory
+> 2) Analyze all the test in order to obtain the exact behaviour of the application. It's required that all test should pass
+> 3) Design a solution that will make the code readable and without repetition
+> 4) Develop the solution
+
+<br />_Result_:
+- Slightly better implementation than the one obtained with the first prompt
+- Code is more readable, succinct.
+- All the test pass
+
+**Claude Sonnet 4**
+The results obtained are available in `task1/claude` folder and are divided in two subfolder: `prompt1` and `prompt2`.
+
+> _Prompt 1_ (Zero shot): The following files I'm showing to you are from an OOP exam. Follow the instructions on
+> TimetableFactoryTest (the comment on the top) make all tests pass.
+
+- Produce a generally good implementation.
+- Usage of Java lang advanced features like records, good code subdivision (at function level), good readability.
+- Not all test are passing: needed a new prompt "The last test doesn't pass" to make it work correctly (as first example). 
+
+> _Prompt 2_ (Chain of thought): The following files I'm showing to you are from an OOP exam. Follow the instructions on
+> TimetableFactoryTest (the comment on the top) make all tests pass.
+> In order to obtain the solution follow these steps:
+
+>    1) Analyze first the interface provided Timetable and TimetableFactory
+>    2) Analyze all the test in order to obtain the exact behaviour of the application. It's required that all test should pass
+>    3) Design a solution that will make the code readable and without repetition
+>    4) Develop the solution
+
+<br />_Result_:
+- Produce an implementation similar to the first one. Test doesn't pass so need another prompt for correcting it. 
+
+**Junie**
+The results obtained are available in `task1/junie` folder.
+
+Note: Junie is integrated inside the IDE of IntelliJ IDEA the prompt is slightly different from the ones that are presented
+before. this tool will automatically analyze the project context using files and other information that are present
+inside the working folder, create a set of goal to achieve and execute a set of instruction:
+
+> _Prompt _ (Zero shot): Given the instruction present on TimetableFactoryTest.java proceed to implement the interfaces
+> of Timetable.java and TimetableFactory.java in order to implement the methods in the test files.
+> Put the code in a new package under io.github.asmd23 named "junie".
+
+Plan Generated
+1. Create the new package structure io.github.asmd23.junie
+2. Analyze the Timetable interface and design an implementation
+3. Analyze the TimetableFactory interface and design an implementation
+4. Implement TimetableImpl class in the junie package
+5. Implement TimetableFactoryImpl class in the junie package
+6. Run the tests to verify the implementation works correctly
+7. Make necessary adjustments to ensure all tests pass
+
+The code generated is generally good, we have some problems similar to the ones encountered with ChatGPT where at some
+point the implementation is too complex. The code that has generated on the first try failed on the last test, then given the feedback
+of the test result, it corrects the implementation with a solution that satisfies all the requirements
+
+**Result of the task**
+All the three alternatives produced a low/medium quality code; they sometimes need some more prompt on making them pass all
+tests (ChatGPT prompt1, Claude).
+With any hint they haven't tried to produce code that presents some architectural pattern all the three candidates tried
+to produce a straightforward solution.
+Claude and ChatGPT presented some hallucinations during the generation with methods that doesn't exists. 
+
+### 2. Testing
+Like the first task I've used for this one the same three LLMs: ChatGPT 4o, Claude Sonnet 4 and Junie in order
+to generate test cases.
+In all cases Interface of Timetable and TimetableFactory where passed in order to give context to the LLMs. 
+
+**ChatGPT 4o**
+The results obtained are available in `task2/chatgpt`.
+
+> _Prompt_: Given the following interfaces Timetable and TimetableFactory, generate a set of unit test using JUnit 5
+> that will test the implementation of these two interfaces. The tests should cover all the methods and possible edge cases.
+
+For what concern the Timetable interface the generated tests are generally good, they try to cover all the methods with
+different scenarios, but they could be improved with some more edge cases. For TimetableFactory the generated tests are
+surprisingly poor, it generates only two tests for two methods, without trying to cover edge cases or alternative scenarios.
+I think that the produced results for the latter is a sort of anomaly, because the interface is quite simple and
+straightforward, so it should be easy to cover all the cases.
+
+```java
+class TimetableFactoryTest {
+
+    private TimetableFactory factory;
+
+    @BeforeEach
+    void setUp() {
+        //factory = new TimetableFactoryImpl(); // Replace with your implementation
+    }
+
+    @Test
+    void testEmptyTimetableIsEmpty() {
+        Timetable table = factory.empty();
+        assertTrue(table.activities().isEmpty());
+        assertTrue(table.days().isEmpty());
+    }
+
+    @Test
+    void testSingleTimetable() {
+        Timetable table = factory.single("Run", "Friday");
+        assertEquals(1, table.getSingleData("Run", "Friday"));
+        assertEquals(Set.of("Run"), table.activities());
+        assertEquals(Set.of("Friday"), table.days());
+    }
+}
+```
+I've asked again to generate tests for TimetableFactory with a new prompt:
+
+> _Prompt_: The previous tests that you generated for TimetableFactory are not sufficient. Please generate a more
+> comprehensive set of unit tests using JUnit 5 that will test the implementation of this interface
+> The tests should cover all the methods and possible edge cases.
+
+
+as a result ChatGPT generated new tests that are more complete and cover all the methods of the interface with different 
+scenarios. I think that the quality of the generated tests is still not optimal, but it's a good improvement compared 
+to the previous.
+
+**Claude**
+The results obtained are available in `task2/claude`.
+
+I've used the same prompt used for ChatGPT:
+> _Prompt_: Given the following interfaces Timetable and TimetableFactory, generate a set of unit test using JUnit 5
+> that will test the implementation of these two interfaces. The tests should cover all the methods and possible edge cases.
+
+The coverage of the generated tests is generally good, it tries to cover all the methods of the interfaces with different
+scenarios with also different edge cases. 
+There are some problems since it tries to implements some mocks for both timetable and timetable factory that are not 
+only unnecessary but also incorrect since, for example, in some methods it assumes that some methods will raise exceptions
+(it shouldn't happen in the actual implementation).
+
+Needed to manually remove the mock and replace it with the actual implementation of the interfaces and modify some tests
+consequently. The results is generally better than the one obtained with ChatGPT.
+
+**Junie**
+The results obtained are available in `task2/junie`.
+
+Since this tool is integrated in the IDE of IntelliJ IDEA it automatically gather the context of the files and tries to 
+generate tests.
+First it generate a plan of the steps that it will follow:
+
+1. Create the new package structure io.github.asmd23.task2.junie
+2. Analyze the Timetable interface 
+3. Analyze the TimetableFactory interface
+4. Analyze Pair class 
+5. Implement TimetableTest class in the junie package
+6. Implement TimetableFactoryTest class in the junie package
+7. Implement PairTest class in the junie package
+8. Run the tests to verify the implementation works correctly
+
+It then execute the plan step by step generating tests for all the three classes, if one of the step fails it tries to 
+correct the problem.
+The results are generally good, the generated tests cover all the methods of the interfaces but they could be improved 
+with some more edge cases.
+
+### 3. TDD
+For this task I've used Copilot for help me to develop the solution of the exercise proposed.
+**Part 1.**
+
+First, I've analyzed the exercise specification and the provided code along with the interface. For convenience, I've
+added a new constructor to LogicsImpl that allows me to pass the position of the knight and pawn directly, instead of
+generating them randomly. This makes it easier to test specific scenarios.
+I've passed these information to Copilot to give it the context where it will work, then i've asked it to generate initial
+tests using only the interface provided. This was to ensure that the tests are not biased by the current implementation
+
+The test added initially are:
+- `testKnightAndPawnInitialPositions`
+- `testValidKnightMoveAndHit` -> Doesn't pass because the knight's move performed is not valid.
+- `testInvalidKnightMove`
+- `testOutOfBoundsThrows`
+- `testConstructorThrowsOnInvalidPositions`
+
+I've manually modified some aspect of the tests in order to use the LogicsImpl constructor.
+These cover the basic functionality, but they don't cover all edge cases. Also, tests are not structured well
+(missing @BeforeEach, @AfterEach, @Nested, etc.).
+
+Manually subdivided test in Nested classes to improve readability and maintainability:
+- `Initialization` -> Covers initial setup and constructor behavior.
+- `Movement` -> Covers valid and invalid knight moves.
+- `Finalization` -> Covers game end conditions and pawn capture.
+
+Given this subdivision, I asked Copilot to generate more tests for each of these categories.
+
+**Part 2.**
+
+I've asked the LLM to analyze the actual implementation of the `LogicsImpl` class and the interface trying to find if any component could
+be externalized:
+- `Logger` -> Used for logging game events or any relevant information.
+
+First I've added the `Logger`interface and its implementation, which allows for different logging strategies (e.g., console, file, etc.).
+I've added tests for the `Logger` class to ensure it works correctly. These were generated by Copilot and cover the basic functionality
+that the logger should provide. As usually, the methods don't cover all cases (e.g. there aren't tests for checking null values).
+I've added manually and then integrated in the LogicsImpl class.
+
