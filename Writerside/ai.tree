@@ -10,5 +10,6 @@
         <toc-element topic="Lab01.md"/>
         <toc-element topic="Lab02.md"/>
         <toc-element topic="Lab03.md"/>
+        <toc-element topic="Lab04.md"/>
     </toc-element>
 </instance-profile>
