@@ -7,11 +7,12 @@
                  start-page="Overview.md">
 
     <toc-element topic="Overview.md">
-        <toc-element topic="Lab07.md"/>
         <toc-element topic="Lab01.md"/>
         <toc-element topic="Lab02.md"/>
         <toc-element topic="Lab03.md"/>
         <toc-element topic="Lab04.md"/>
         <toc-element topic="Lab06.md"/>
+        <toc-element topic="Lab07.md"/>
+        <toc-element topic="Lab08.md"/>
     </toc-element>
 </instance-profile>
