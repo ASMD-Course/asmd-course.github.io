@@ -278,7 +278,7 @@ As response the model correctly identifies the model as a representation of the 
 Yep — I can read it. This is a PRISM CTMC for the classic Readers–Writers pattern, modeled as a closed population of 
 N clients (here N=20) circulating through “idle → request → read/write → finish → idle”, with a single writer lock.
 ```
-It's importan to note that the memory of the model was cleared before loading the model, 
+It's important to note that the memory of the model was cleared before loading the model, 
 so it's not biased by previous knowledge.
 
 Now we ask to perform the same verifications we did in task 1 and we compare the results:
