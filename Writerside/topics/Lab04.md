@@ -1,4 +1,6 @@
-# Lab04
+# Laboratory 04
+
+Code available [here](https://github.com/ASMD-Course/asmd23-public-04-adv-prg-patterns)
 
 ## Objectives
 

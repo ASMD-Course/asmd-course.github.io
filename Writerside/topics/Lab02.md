@@ -1,14 +1,11 @@
-# Lab02
+# Laboratory 02
 
+Code available [here](https://github.com/ASMD-Course/asmd23-public-02-testing)
 
 ## Objectives
-
 - be operative with Mockito and JUnit
-
 - understand mocking in its details
-
 - exercise with integration testing
-
 - pre-check ability of ChatGPT to help you in unit and integration testing
 
 ## Tasks

@@ -1,4 +1,6 @@
-# Lab08
+# Laboratory 08
+
+Code available [here](https://github.com/ASMD-Course/asmd23-public-models)
 
 ## Objectives
 

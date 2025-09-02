@@ -1,7 +1,6 @@
-# Lab01
+# Laboratory 01
 
-In the following lab we will experiment the various frameworks and techniques for creating BDD/ATDD tests in a Java
-application. 
+Code available [here](https://github.com/ASMD-Course/asmd23-lab01-atdd)
 
 ## Objectives
  - be operative with Cucumber/JUnit/Java/IntelliJ
@@ -107,7 +106,7 @@ From the feedback received from the customer, it can be deduced that the custome
 of the calculator by adding additional operations that it can perform (such as subtraction or multiplication) and modify 
 existing ones (input control and handling more numbers per operation).
 
-I will proceed to implement the new features. I'll start by adding more scenarios to the Gherkin file and then implement
+I will proceed to implement these starting by adding more scenarios to the Gherkin file and then implement
 the new features.
 
 ```gherkin

@@ -1,9 +1,6 @@
-# ASMD Course Overview
+# Laboratories
 
-The following website documents the laboratory exercises of
-**Advanced Software Modelling and Design (_ASMD_)** course for the 2023 / 2024 academic year.
-
-The code developed during the labs is available on this [GitHub Organization](https://github.com/ASMD-Course)
+ Please referee to the [Github Organization](https://github.com/ASMD-Course) for the code developed during the labs.
 
 ## Lab Exercises
 
@@ -16,8 +13,3 @@ The code developed during the labs is available on this [GitHub Organization](ht
 - [Lab 8: Stochastic analysis: probabilistic/continuous-stochastic logic from model checking to simulation](Lab08.md)
 - [Lab 9: Reinforcement Learning from MDP to RL and Q-Learning, Deep Q-Learning, and MARL](Lab09.md)
 - [Lab 11: Aggregate Computing in Scafi](Lab11.md)
-
-## Further information
-
-- [Course website](https://www.unibo.it/it/studiare/insegnamenti-competenze-trasversali-moocs/insegnamenti/insegnamento/2023/483706).
-- [Virtuale](https://virtuale.unibo.it/course/view.php?id=50583)

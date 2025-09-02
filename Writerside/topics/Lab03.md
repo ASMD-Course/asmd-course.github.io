@@ -1,7 +1,8 @@
-# Lab03
+# Laboratory 03
+
+Code available [here](https://github.com/ASMD-Course/ASMD-lab03-LLM)
 
 ## Objectives
-
 - Understand the potential of LLMs in software development
 - Experiment with LLMs in the context of software testing
 - Investigate the effectiveness of LLMs in a TDD scenario

@@ -1,7 +1,6 @@
-# Lab09
+# Laboratory 09
 
-Start typing here...
-
+Code available [here](https://github.com/ASMD-Course/asmd23-public-models)
 
 ## Objectives
  
